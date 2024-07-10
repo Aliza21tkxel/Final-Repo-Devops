@@ -92,7 +92,7 @@ resource "aws_instance" "Terraform-ec2" {
   provisioner "local-exec" {
     command = <<EOT
       echo "[Terraform-ec2]" > inventory
-      echo "${aws_instance.Terrafrom-ec2.public_ip} ansible_user=ubuntu" >> inventory
+      echo "${aws_instance.Terraform-ec2.public_ip} ansible_user=ubuntu" >> inventory
       ansible-playbook -i inventory docker-setup.yml
     EOT
   }
