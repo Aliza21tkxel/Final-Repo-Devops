@@ -93,7 +93,7 @@ resource "aws_instance" "Terraform-ec2" {
     command = <<EOT
       echo "[Terraform-ec2]" > inventory
       echo "${aws_instance.Terraform-ec2.public_ip} ansible_user=ubuntu" >> inventory
-      ansible-playbook -i inventory docker-setup.yml
+      ansible-playbook -i inventory ../ansible/playbooks/docker-setup.yml
     EOT
   }
 
