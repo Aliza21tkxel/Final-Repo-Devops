@@ -84,16 +84,20 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
+resource "aws_instance" "Terrafrom-ec2" {
+  ami           = "ami-xxxxxxxx"  # Replace with your desired AMI
+  instance_type = "t2.micro"
+  key_name      = "my-terraform-key"     # Name of the key pair created in AWS
 
-
-
-resource "aws_instance" "Terrafomr-ec2" {
-  ami                    = "ami-0c02fb55956c7d316"  # Replace with the desired AMI ID 
-  instance_type          = var.instance_type
-  subnet_id              = aws_subnet.public.id
-  vpc_security_group_ids = [aws_security_group.web_sg.id]
-  
-  tags = {
-    Name = "${var.environment}-web-instance"
+  provisioner "local-exec" {
+    command = <<EOT
+      echo "[devops-server]" > inventory
+      echo "${aws_instance.Terrafrom-ec2.public_ip} ansible_user=ubuntu" >> inventory
+      ansible-playbook -i inventory docker-setup.yml
+    EOT
   }
+
 }
+
+
+
