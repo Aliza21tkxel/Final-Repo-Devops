@@ -91,15 +91,13 @@ resource "aws_instance" "Terraform-ec2" {
   tags = {
     Name = "${var.environment}-web-instance"
   }
-  provisioner "local-exec" {
+  provisioner "remote-exec" {
     command = <<EOT
       echo "[Terraform-ec2]" > inventory
       echo "${aws_instance.Terraform-ec2.public_ip} ansible_user=ubuntu" >> inventory
       
     EOT
   }
-
-
 }
 
 
