@@ -95,5 +95,5 @@ resource "aws_instance" "web" {
   
   tags = {
     Name = "${var.environment}-web-instance"
-  }.
+  }
 }
