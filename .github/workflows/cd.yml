@@ -79,9 +79,10 @@ jobs:
 
     - name: Install Ansible
       run: pip install ansible
-      
+
     - name: Debug environment
       run: env
+      
     - name: Create inventory file
       run: |
         echo "[Terraform-ec2]" > inventory
