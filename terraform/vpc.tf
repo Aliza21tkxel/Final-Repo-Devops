@@ -87,7 +87,7 @@ resource "aws_security_group" "web_sg" {
 resource "aws_instance" "Terraform-ec2" {
   ami           = "ami-0c02fb55956c7d316"  # Replace with your desired AMI
   instance_type = "t3.micro"
-  key_name      = "my-terraform-key"     # Name of the key pair created in AWS 
+  # key_name      = "my-terraform-key"     # Name of the key pair created in AWS 
   tags = {
     Name = "${var.environment}-web-instance"
   }
