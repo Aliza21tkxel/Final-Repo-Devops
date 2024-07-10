@@ -1,0 +1,10 @@
+name: Install Docker and Docker Compose on EC2 instance
+  hosts: web
+  become: yes
+  tasks:
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+    - name: Install Docker Independencies
+      apt:
+         name:
