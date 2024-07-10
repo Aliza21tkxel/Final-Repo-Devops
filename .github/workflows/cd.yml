@@ -13,80 +13,76 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
 
-    - name: Install dependencies
-      run: npm install
+      - name: Install dependencies
+        run: npm install
 
-    - name: Run tests
-      run: npm test
+      - name: Run tests
+        run: npm test
 
-    - name: Build project
-      run: npm run build
+      - name: Build project
+        run: npm run build
 
   terraform:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 1.0.0
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.0.0
 
-    - name: Terraform Init
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        TF_VAR_ec2_public_key: ${{ secrets.EC2_PUBLIC_KEY }}
-      run: terraform init
-      working-directory: ./terraform
+      - name: Terraform Init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          TF_VAR_ec2_public_key: ${{ secrets.EC2_PUBLIC_KEY }}
+        run: terraform init
+        working-directory: ./terraform
 
-    - name: Terraform Apply
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        TF_VAR_ec2_public_key: ${{ secrets.EC2_PUBLIC_KEY }}
-      run: terraform apply -auto-approve
-      working-directory: ./terraform
+      - name: Terraform Apply
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          TF_VAR_ec2_public_key: ${{ secrets.EC2_PUBLIC_KEY }}
+        run: terraform apply -auto-approve
+        working-directory: ./terraform
 
-    - name: Save Terraform output
-      id: save_output
-      run: echo "instance_ip=$(terraform output -raw instance_ip)" >> $GITHUB_ENV
-      working-directory: ./terraform
+      - name: Save Terraform output to file
+        run: echo "instance_ip=$(terraform output -raw instance_ip)" > terraform_output.txt
+        working-directory: ./terraform
 
   ansible:
     needs: terraform
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.x
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
 
-    - name: Install Ansible
-      run: pip install ansible
+      - name: Install Ansible
+        run: pip install ansible
 
-    - name: Debug environment
-      run: env
+      - name: Create inventory file
+        run: echo "[Terraform-ec2]" > inventory
 
-    - name: Create inventory file
-      run: echo "[Terraform-ec2]" > inventory
+      - name: Add instance to inventory
+        run: cat terraform_output.txt >> inventory
 
-    - name: Add instance to inventory
-      run: echo "${{ env.instance_ip }} ansible_user=ubuntu" >> inventory
-
-    - name: Run Ansible playbook
-      run: ansible-playbook -i inventory ./ansible/playbooks/docker-setup.yml
+      - name: Run Ansible playbook
+        run: ansible-playbook -i inventory ./ansible/playbooks/docker-setup.yml
