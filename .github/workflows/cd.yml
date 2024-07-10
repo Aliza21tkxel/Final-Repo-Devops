@@ -98,3 +98,6 @@ jobs:
 
       - name: Run Ansible playbook
         run: ansible-playbook -i inventory ./ansible/playbooks/docker-setup.yml
+        
+      - name: Delete Terraform output artifact
+        run: rm terraform_output.txt
