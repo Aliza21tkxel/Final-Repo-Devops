@@ -97,6 +97,10 @@ jobs:
       - name: Add instance to inventory
         run: cat terraform_output.txt >> inventory
 
+      - name: Debug Secret
+        run: echo "${{ secrets.EC2_PRIVATE_KEY }}" | wc -c  # This will print the length of the secret to ensure it's not empty
+        shell: bash
+        
       - name: Start SSH agent and add key
         uses: webfactory/ssh-agent@v0.5.3
         with:
